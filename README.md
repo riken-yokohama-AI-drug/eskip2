@@ -82,7 +82,9 @@ This notebook demonstrates how to:
 - Load pretrained weights from eSkip2
 - Run training with your custom dataset  
 
-Please open the Colab notebook for step-by-step instructions:  To Be Added.
+Please open the Colab notebook for step-by-step instructions:
+
+https://colab.research.google.com/drive/1R-LkMtCbEGK31URf5-DtYRVr1SGYkaZb#scrollTo=WbGIEquVUH-w
 
 ## Requirements
 
