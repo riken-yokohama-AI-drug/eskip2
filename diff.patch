@@ -1,0 +1,260 @@
+diff --git a/configs/dataset/genomic_benchmark.yaml b/configs/dataset/genomic_benchmark.yaml
+index a023bf7..ff56511 100644
+--- a/configs/dataset/genomic_benchmark.yaml
++++ b/configs/dataset/genomic_benchmark.yaml
+@@ -1,5 +1,6 @@
+ _name_: genomic_benchmark
+-dataset_name: dummy_mouse_enhancers_ensembl
++#dataset_name: dummy_mouse_enhancers_ensembl
++dataset_name: DMD_44_wMFASS
+ dest_path: null
+ max_length: 1024
+ d_output: ${.${.dataset_name}.classes}
+@@ -11,30 +12,69 @@ train_len: ${.${.dataset_name}.train_len}
+ __l_max: ${.max_length}
+ shuffle: true  # set this as default!
+ # these are used to find the right attributes automatically for each dataset
+-dummy_mouse_enhancers_ensembl:
+-  train_len: 1210
++#DMD_53_NP_cN_noE2-45_PN:
++#  train_len: 391
++#  classes: 2
++DMD_53:
++  train_len: 631
+   classes: 2
+-demo_coding_vs_intergenomic_seqs:
+-  train_len: 100_000
++DMD_44:
++  train_len: 631 
+   classes: 2
+-demo_human_or_worm:
+-  train_len: 100_000
++DMD_45:
++  train_len: 631
+   classes: 2
+-human_enhancers_cohn:
+-  train_len: 27791
++MSTN_2:
++  train_len: 631
+   classes: 2
+-human_enhancers_ensembl:
+-  train_len: 154842
++BIM_3_wMFASS:
++  train_len: 30638
+   classes: 2
+-human_ensembl_regulatory:
+-  train_len: 289061
+-  classes: 3
+-human_nontata_promoters:
+-  train_len: 36131
++DMD_53_wMFASS:
++  train_len: 30646
+   classes: 2
+-human_ocr_ensembl:
+-  train_len: 174756
++DMD_44_wMFASS:
++  train_len: 30646
+   classes: 2
++DMD_45_wMFASS:
++  train_len: 30646
++  classes: 2
++MSTN_2_wMFASS:
++  train_len: 30646
++  classes: 2
++#Random_1:
++#  train_len: 15043
++#  classes: 2
++#Random_2:
++#  train_len: 15043
++#  classes: 2
++#Random_3:
++#  train_len: 15043
++#  classes: 2
++#dummy_mouse_enhancers_ensembl:
++#  train_len: 1210
++#  classes: 2
++#demo_coding_vs_intergenomic_seqs:
++#  train_len: 100_000
++#  classes: 2
++#demo_human_or_worm:
++#  train_len: 100_000
++#  classes: 2
++#human_enhancers_cohn:
++#  train_len: 27791
++#  classes: 2
++#human_enhancers_ensembl:
++#  train_len: 154842
++#  classes: 2
++#human_ensembl_regulatory:
++#  train_len: 289061
++#  classes: 3
++#human_nontata_promoters:
++#  train_len: 36131
++#  classes: 2
++#human_ocr_ensembl:
++#  train_len: 174756
++#  classes: 2
+ 
+ # there are 8 datasets in this suite, choose 1 at a time, with their corresponding settings
+ # name                                num_seqs        num_classes     median len    std
+
+diff --git a/src/tasks/metrics.py b/src/tasks/metrics.py
+index 030d891..ce95253 100644
+--- a/src/tasks/metrics.py
++++ b/src/tasks/metrics.py
+@@ -1,4 +1,7 @@
+ import math
++#CS 
++from typing import Optional, List
++#CS 
+ import torch
+ import torch.nn.functional as F
+ from sklearn.metrics import f1_score, roc_auc_score
+@@ -8,6 +11,7 @@ import torch.distributions as dist
+ from sklearn.metrics import f1_score, roc_auc_score, matthews_corrcoef
+ from torchmetrics import Metric
+ from torchmetrics.classification import MulticlassRecall, MulticlassPrecision
++import numpy as np
+ 
+ class CorrectAggregatedMetric(Metric):
+     """This is needed to calculate some metrics b/c small batch sizes cause aggregation via a simple
+@@ -85,6 +89,31 @@ def mcc(logits, y):
+     y_hat = torch.argmax(logits, dim=-1)
+     return matthews_corrcoef(y.cpu().numpy(), y_hat.cpu().numpy())
+ 
++#CS added 
++#CS def binary_auc(logits, y):
++#CS    # (1) 1列目の「スコア」を取り出し、detach→cpu→numpy
++#CS    scores = logits[:, 1].detach().cpu().numpy()
++#CS    y_np   = y.detach().cpu().numpy()
++#CS
++#CS    # (2) ラベルが2クラス揃っているかチェック
++#CS    if len(np.unique(y_np)) < 2:
++#CS        return float("nan")  # あるいは 0.0 に置き換えてもよい
++#CS
++#CS    # (3) average 指定なしで AUC 計算
++#CS    return roc_auc_score(y_np, scores)
++def binary_auc(logits, y):
++    # 1) flatten batch×… を 2D logits, 1D labels に
++    logits = logits.view(-1, logits.shape[-1]).detach()
++    y      = y.view(-1).detach()
++    # 2) クラス1のスコアをそのまま使う（softmax は不要）
++    scores = logits[:, 1].cpu().numpy()
++    y_np   = y.cpu().numpy()
++    # 3) 0/1 両方が揃っていないバッチは定義できないので nan
++    if len(np.unique(y_np)) < 2:
++        return float("nan")
++    # 4) average 引数なしで計算
++    return roc_auc_score(y_np, scores)
++
+ 
+ def last_k_ppl(logits, y, seq_len=1024, k=None):
+     '''
+@@ -176,12 +205,60 @@ def padded_cross_entropy(logits, y, pad_mask, pad_value=-1):
+     y_pad = y_pad.view(-1)
+     return F.cross_entropy(logits, y_pad, ignore_index=pad_value)
+ 
+-
+-def cross_entropy(logits, y, ignore_index=-100):
+-    logits = logits.view(-1, logits.shape[-1])
+-    y = y.view(-1)
+-    return F.cross_entropy(logits, y, ignore_index=ignore_index)
+-
++#CS def cross_entropy(logits, y, ignore_index=-100):
++#CS     logits = logits.view(-1, logits.shape[-1])
++#CS     y = y.view(-1)
++#CS     return F.cross_entropy(logits, y, ignore_index=ignore_index)
++
++#CS --- a/src/tasks/metrics.py
++#CS +++ b/src/tasks/metrics.py
++#CS @@
++#CS -def cross_entropy(logits, y, ignore_index=-100):
++#CS -   logits = logits.view(-1, logits.shape[-1])
++#CS -   y = y.view(-1)
++#CS -   return F.cross_entropy(logits, y, ignore_index=ignore_index)
++#CS +def cross_entropy(logits, y, ignore_index=-100, weight: Optional[List[float]] = None):
++#CS +   """
++#CS +   重み付きクロスエントロピー損失
++#CS +   weight: [w_neg, w_pos] の形で渡すと，
++#CS +           torch.Tensor に変換して F.cross_entropy の weight に設定します
++#CS +   """
++#CS +   logits = logits.view(-1, logits.shape[-1])
++#CS +   y = y.view(-1)
++#CS +   if weight is not None:
++#CS +       # デバイス合わせて Tensor 化
++#CS +       device = logits.device
++#CS +       weight_tensor = torch.tensor(weight, device=device, dtype=logits.dtype)
++#CS +   else:
++#CS +       weight_tensor = None
++#CS +   return F.cross_entropy(
++#CS +       logits, y,
++#CS +       weight=weight_tensor,
++#CS +       ignore_index=ignore_index
++#CS +   )
++
++def cross_entropy(logits, y, ignore_index=-100, weight: Optional[List[float]] = None):
++   """
++   重み付きクロスエントロピー損失
++   weight: [w_neg, w_pos] の形で渡すと，
++           torch.Tensor に変換して F.cross_entropy の weight に設定します
++   """
++   logits = logits.view(-1, logits.shape[-1])
++   y = y.view(-1)
++   if weight is not None:
++       # デバイス合わせて Tensor 化
++       device = logits.device
++       weight_tensor = torch.tensor(weight, device=device, dtype=logits.dtype)
++   else:
++       weight_tensor = None
++   return F.cross_entropy(
++       logits, y,
++       weight=weight_tensor,
++       ignore_index=ignore_index,
++       label_smoothing=0.01
++   )
++
++#CS TO HERE
+ 
+ def soft_cross_entropy(logits, y, label_smoothing=0.0):
+     logits = logits.view(-1, logits.shape[-1])
+@@ -243,18 +320,27 @@ def roc_auc_macro(logits, y):
+         -1, logits.shape[-1]
+     ).detach()  # KS: had to add detach to eval while training
+     y = y.view(-1)
+-    return roc_auc_score(
++    try: 
++        rt = roc_auc_score(
+         y.cpu().numpy(), F.softmax(logits, dim=-1).cpu().numpy()[:, 1], average="macro"
+-    )
++        )
++    except ValueError:
++        rt = 0
++    return  rt
+ 
+ 
+ def roc_auc_micro(logits, y):
+     logits = logits.view(-1, logits.shape[-1])
+     y = y.view(-1)
+-    return roc_auc_score(
++    if len(np.unique(y_np)) < 2:
++        return float("nan")
++    try: 
++        rt = roc_auc_score(
+         y.cpu().numpy(), F.softmax(logits, dim=-1).cpu().numpy()[:, 1], average="micro"
+-    )
+-
++        )
++    except ValueError:
++        rt = 0
++    return  rt
+ 
+ def mse(outs, y, len_batch=None):
+     # assert outs.shape[:-1] == y.shape and outs.shape[-1] == 1
+@@ -329,6 +415,7 @@ output_metric_fns = {
+     'accuracy@10': partial(accuracy_at_k, k=10),
+     "eval_loss": loss,
+     "mcc": mcc,
++    "binary_auc": binary_auc,
+     "mse": mse,
+     "mae": mae,
+     "forecast_rmse": forecast_rmse,
