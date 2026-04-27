@@ -14,7 +14,6 @@ The model builds on the genome-pretrained **HyenaDNA** architecture and has been
 
 - **Complex ASO design**: Helps prioritize effective target sites for dual-targeting ASOs.
 - **Broad applicability**: Works with both exonic and intronic regions.
-- **Benchmark datasets included**: Dataset of ASO activity for training and evaluation.
 
 ---
 
