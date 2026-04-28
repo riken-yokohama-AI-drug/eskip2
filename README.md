@@ -74,11 +74,11 @@ This repository additionally provides scripts for prediction and preprocessing:
     ```
 
 ### Fine-tuning and gene-addaptation
-For users who would like to **fine-tune pretrained hyenaDNA on their own datasets** or **adapt the eSkip2 to a specific gene of interest**, we provide a Google Colab notebook.  
+For users who would like to **fine-tune pretrained hyenaDNA on their own datasets** or **adapt the eSkip2-base (checkpoints.zip) to a specific gene of interest**, we provide a Google Colab notebook.  
 This notebook demonstrates how to:
 
 - Prepare input data for gene-addaptation
-- Load pretrained weights from eSkip2
+- Load pretrained weights from eSkip2-base (checkpoints.zip)
 - Run training with your custom dataset  
 
 Please open the Colab notebook for step-by-step instructions:
