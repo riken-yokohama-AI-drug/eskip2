@@ -73,6 +73,24 @@ This repository additionally provides scripts for prediction and preprocessing:
     --output "Output file name"
     ```
 
+### Tests
+
+The `tests/` directory contains workflows for evaluating eSkip2 on test-set exons. These tests prioritize promising ASO target regions that are expected to induce exon skipping and calculate AUROC values against curated benchmark labels.
+
+After applying the eSkip2 patch to the HyenaDNA repository, run:
+
+```bash
+bash run-test.bash
+```
+
+The script runs prediction for the test-set exons and calculates AUROC values. Precomputed prediction results are included in each directory.
+
+The tests require `datasets.zip` from the companion `eskip-data` repository.
+
+`run-test.bash` automatically downloads and extracts `datasets.zip` when it is available. The `datasets.zip` file will be uploaded to the `eskip-data` repository after publication of the manuscript.
+
+
+
 ### Fine-tuning and gene-addaptation
 For users who would like to **fine-tune pretrained hyenaDNA on their own datasets** or **adapt the eSkip2-base (checkpoints.zip) to a specific gene of interest**, we provide a Google Colab notebook.  
 This notebook demonstrates how to:
