@@ -159,11 +159,9 @@ tokenizer = CharacterTokenizer(
 
 
 
-# 1. CSV 読み込み
-# CSVは "sequence" と "label" の2列を想定
+# 1. Read csv
 df = pd.read_csv('NF1_17.csv')
 
-# モデル・トークナイザを準備済みとして
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 model.eval()
@@ -176,37 +174,32 @@ for idx, row in df.iterrows():
     sequence = row['sequence']
     label = row['label']
     
-    # 文字列→tokenize
     tok_seq = tokenizer(sequence)
     tok_seq = tok_seq["input_ids"]
 
     if len(tok_seq) > 0 and tok_seq[0] == 0:
         tok_seq = tok_seq[1:]
-    # ③ 末尾の“1”を削る
     if len(tok_seq) > 0 and tok_seq[-1] == 1:
         tok_seq = tok_seq[:-1]
-    # ④ 足りない分を左側に4でパディング
     pad_len = max_length - len(tok_seq)
     if pad_len > 0:
         tok_seq = [4] * pad_len + tok_seq
     else:
-        # 万一長すぎる場合は右を切る
         tok_seq = tok_seq[-self.cfg.max_length :]
 
 
 
     
-    # Tensorに変換
     tok_seq = torch.LongTensor(tok_seq).unsqueeze(0).to(device)  # batch dim
 
     with torch.inference_mode():
-        logits = model(tok_seq)  # logitsを直接出力する場合
+        logits = model(tok_seq) 
     #CS
     print(logits)
     
     # logits → probability
     probs = F.softmax(logits, dim=-1)
-    prob_positive = probs[0,1].item()  # クラス1の確率
+    prob_positive = probs[0,1].item() 
     
     pred = int(torch.argmax(probs, dim=-1))
     
@@ -214,14 +207,13 @@ for idx, row in df.iterrows():
     all_preds.append(pred)
     all_labels.append(label)
 
-# 結果をDataFrameにまとめる
 df['probability'] = all_probs
 df['prediction'] = all_preds
 
-# 2. 結果をCSVに保存
+# 2. save results to csv
 df.to_csv('predict_NF1_17.csv', index=False)
 
-# 3. 評価指標計算
+# 3. calculate metrics
 acc = accuracy_score(all_labels, all_preds)
 auc = roc_auc_score(all_labels, all_probs)
 mcc = matthews_corrcoef(all_labels, all_preds)
@@ -229,7 +221,7 @@ cm = confusion_matrix(all_labels, all_preds)
 # TN is C00 , FP is C01
 # FN is C10 , TP is C11
 
-# 4. 標準出力
+# 4. output
 print(f"Accuracy: {acc:.4f}")
 print(f"AUC: {auc:.4f}")
 print(f"MCC: {mcc:.4f}")
