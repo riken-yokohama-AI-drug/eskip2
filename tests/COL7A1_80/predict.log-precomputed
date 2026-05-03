@@ -1,0 +1,26 @@
+max_length
+500
+Using device: cuda
+Loaded pretrained weights ok!
+tensor([[-0.0022, -0.3291]], device='cuda:0')
+tensor([[-1.7878,  1.3640]], device='cuda:0')
+tensor([[-1.7328,  1.3115]], device='cuda:0')
+tensor([[-1.6838,  1.2611]], device='cuda:0')
+tensor([[-1.6740,  1.2509]], device='cuda:0')
+tensor([[-1.5862,  1.1724]], device='cuda:0')
+tensor([[-1.6520,  1.2347]], device='cuda:0')
+tensor([[-1.7052,  1.2888]], device='cuda:0')
+tensor([[-0.9935,  0.5972]], device='cuda:0')
+tensor([[-0.3258, -0.0578]], device='cuda:0')
+tensor([[ 0.3799, -0.7724]], device='cuda:0')
+tensor([[-0.4397,  0.0669]], device='cuda:0')
+tensor([[-1.7686,  1.3679]], device='cuda:0')
+tensor([[-1.0475,  0.6325]], device='cuda:0')
+tensor([[-0.9370,  0.5256]], device='cuda:0')
+tensor([[-1.5342,  1.1322]], device='cuda:0')
+Accuracy: 0.2500
+AUC: 0.7083
+MCC: -0.2182
+Confusion Matrix:
+[[ 1 11]
+ [ 1  3]]

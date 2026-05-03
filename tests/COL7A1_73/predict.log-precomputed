@@ -1,0 +1,49 @@
+max_length
+500
+Using device: cuda
+Loaded pretrained weights ok!
+tensor([[-3.6875,  3.3823]], device='cuda:0')
+tensor([[-3.7612,  3.4643]], device='cuda:0')
+tensor([[-3.7120,  3.4184]], device='cuda:0')
+tensor([[-3.7001,  3.4076]], device='cuda:0')
+tensor([[-3.6410,  3.3564]], device='cuda:0')
+tensor([[-3.6190,  3.3138]], device='cuda:0')
+tensor([[-3.5126,  3.2102]], device='cuda:0')
+tensor([[-3.9001,  3.5821]], device='cuda:0')
+tensor([[-3.6013,  3.2808]], device='cuda:0')
+tensor([[-3.2616,  2.9444]], device='cuda:0')
+tensor([[-3.8224,  3.5215]], device='cuda:0')
+tensor([[-3.9453,  3.6338]], device='cuda:0')
+tensor([[-3.6144,  3.2975]], device='cuda:0')
+tensor([[-3.2378,  2.9028]], device='cuda:0')
+tensor([[-3.8444,  3.5368]], device='cuda:0')
+tensor([[-3.8566,  3.5524]], device='cuda:0')
+tensor([[-3.8101,  3.5061]], device='cuda:0')
+tensor([[ 0.5872, -0.8816]], device='cuda:0')
+tensor([[ 1.0805, -1.3575]], device='cuda:0')
+tensor([[ 1.3939, -1.6606]], device='cuda:0')
+tensor([[ 2.0324, -2.2779]], device='cuda:0')
+tensor([[ 2.3973, -2.6299]], device='cuda:0')
+tensor([[ 2.7105, -2.9298]], device='cuda:0')
+tensor([[-3.8174,  3.5108]], device='cuda:0')
+tensor([[-3.5531,  3.2512]], device='cuda:0')
+tensor([[-3.6810,  3.3606]], device='cuda:0')
+tensor([[-3.2277,  2.8931]], device='cuda:0')
+tensor([[-2.6529,  2.3111]], device='cuda:0')
+tensor([[-3.1360,  2.7745]], device='cuda:0')
+tensor([[-3.0113,  2.7071]], device='cuda:0')
+tensor([[-1.3840,  1.0349]], device='cuda:0')
+tensor([[-2.1346,  1.7856]], device='cuda:0')
+tensor([[-2.0227,  1.6763]], device='cuda:0')
+tensor([[-2.1631,  1.8129]], device='cuda:0')
+tensor([[-1.7256,  1.3797]], device='cuda:0')
+tensor([[-1.1441,  0.8067]], device='cuda:0')
+tensor([[-0.5899,  0.2627]], device='cuda:0')
+tensor([[-0.2626, -0.0600]], device='cuda:0')
+tensor([[-0.0856, -0.2294]], device='cuda:0')
+Accuracy: 0.6154
+AUC: 0.9412
+MCC: 0.4111
+Confusion Matrix:
+[[ 7 15]
+ [ 0 17]]
